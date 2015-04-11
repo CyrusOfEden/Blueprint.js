@@ -1,25 +1,26 @@
 {
   "name": "blueprint-js",
-  "version": "1.0.0",
-  "description": "Full-featured JavaScript POJOs. No dependencies.",
+  "version": "1.1.0",
+  "description": "Full-featured JavaScript class creator. Simple, convenient API.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/knrz/Model.js.git"
+    "url": "https://github.com/knrz/Blueprint.js.git"
   },
   "keywords": [
-    "Model",
-    "POJO"
+    "Blueprint",
+    "POJO",
+    "class"
   ],
   "author": "knrz",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/knrz/Model.js/issues"
+    "url": "https://github.com/knrz/Blueprint.js/issues"
   },
-  "homepage": "https://github.com/knrz/Model.js",
+  "homepage": "https://github.com/knrz/Blueprint.js",
   "devDependencies": {
     "babel": "^5.0.12",
     "gulp": "^3.8.11",
