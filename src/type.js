@@ -6,6 +6,6 @@ const types = {
   number: (n) => Number(n)
 }
 
-export default function Type(type) {
-  return types[type.toLowerCase()];
+export default function type(t) {
+  return types[t.toLowerCase()];
 }

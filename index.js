@@ -4,26 +4,31 @@ var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? ob
 
 var _defineProperty = function (obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: key == null || typeof Symbol == 'undefined' || key.constructor !== Symbol, configurable: true, writable: true }); };
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
+var _EventEmitter2 = require('event');
+
 var _Type = require('./type');
 
 var _Type2 = _interopRequireWildcard(_Type);
 
-var Blueprint = (function () {
+var Blueprint = (function (_EventEmitter) {
   function Blueprint() {
     var attrs = arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Blueprint);
 
+    _get(Object.getPrototypeOf(Blueprint.prototype), 'constructor', this).call(this);
     this.attributes = {};
     this.observers = {};
     for (var attr in attrs) {
@@ -32,18 +37,20 @@ var Blueprint = (function () {
     }
   }
 
+  _inherits(Blueprint, _EventEmitter);
+
   _createClass(Blueprint, [{
     key: 'set',
     value: function set(attr, value) {
-      var broadcastChange = arguments[2] === undefined ? true : arguments[2];
+      var emitChange = arguments[2] === undefined ? true : arguments[2];
 
       var previous = this.attributes[attr];
       var current = this.constructor.attributes[attr](value);
       if (previous === current) {
         return;
       }this.attributes[attr] = current;
-      this.notify('changed:' + attr, { previous: previous, current: current });
-      if (broadcastChange) this.notify('changed', _defineProperty({}, attr, value));
+      this.emit('changed:' + attr, { previous: previous, current: current });
+      if (emitChange) this.emit('changed', _defineProperty({}, attr, value));
     }
   }, {
     key: 'get',
@@ -56,59 +63,7 @@ var Blueprint = (function () {
       for (var attr in attrs) {
         this.set(attr, attrs[attr], false);
       }
-      this.notify('changed', attrs);
-      return this;
-    }
-  }, {
-    key: 'notify',
-    value: function notify(event, data) {
-      var observers = this.observers[event];
-      if (!observers) {
-        return;
-      }for (var id in observers) {
-        observers[id].call(event, data, this);
-      }
-      return this;
-    }
-  }, {
-    key: 'on',
-    value: function on(events, observer) {
-      for (var i = 0; i < events.length; i++) {
-        var _event = events[i];
-        if (!this.observers[_event]) this.observers[_event] = {};
-        this.observers[_event][observer.id] = observer;
-      }
-      return this;
-    }
-  }, {
-    key: 'observe',
-    value: function observe(events, observer) {
-      return this.on(events, observer);
-    }
-  }, {
-    key: 'off',
-    value: function off(events, observer) {
-      for (var i = 0; i < events.length; i++) {
-        var _event2 = events[i];
-        if (!this.observers[_event2]) continue;
-        delete this.observers[_event2][observer.id];
-      }
-      return this;
-    }
-  }, {
-    key: 'unobserve',
-    value: function unobserve(events, observe) {
-      return this.off(events, observer);
-    }
-  }, {
-    key: 'getObservers',
-    value: function getObservers() {
-      return this.observers;
-    }
-  }, {
-    key: 'removeObservers',
-    value: function removeObservers() {
-      this.observers = {};
+      this.emit('changed', attrs);
       return this;
     }
   }, {
@@ -119,11 +74,7 @@ var Blueprint = (function () {
   }, {
     key: 'toString',
     value: function toString() {
-      var repr = '';
-      for (var attr in this.attributes) {
-        repr += '' + attr + ': ' + this[attr] + ' ';
-      }
-      return '' + this.constructor.name + ' { ' + repr + ' }';
+      return this.attributes.toJSON();
     }
   }], [{
     key: 'build',
@@ -166,7 +117,7 @@ var Blueprint = (function () {
   }]);
 
   return Blueprint;
-})();
+})(_EventEmitter2.EventEmitter);
 
 Blueprint.type = _Type2['default'];
 
