@@ -1,6 +1,6 @@
 {
   "name": "blueprint-js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Full-featured JavaScript class creator. Simple, convenient API.",
   "main": "index.js",
   "scripts": {
