@@ -1,25 +1,20 @@
 import Type from './type';
 
-class Model {
+class Blueprint {
   static build(attrs = {}) {
-    class Through extends Model {};
-    Through.attributes = attrs;
+    class Model extends Blueprint {};
     for (let attr in attrs) {
-      Object.defineProperty(Through.prototype, attr, {
+      Object.defineProperty(Model.prototype, attr, {
         get() {
-          return this.attributes[attr];
+          return this.get(attr);
         },
         set(value) {
-          const previous = this.attributes[attr]
-          const current = attrs[attr](value);
-          if (current === previous) return;
-          this.notify('changed', { [attr]: current });
-          this.notify(`changed:${attr}`, { previous, current });
-          this.attributes[attr] = current;
+          return this.set(attr, value);
         }
       });
     }
-    return Through;
+    Model.attributes = attrs;
+    return Model;
   }
   constructor(attrs = {}) {
     this.attributes = {};
@@ -29,9 +24,20 @@ class Model {
       this[attr] = attrs[attr];
     }
   }
+  set(attr, value, broadcastChange = true) {
+    const previous = this.attributes[attr];
+    const current = this.constructor.attributes[attr](value);
+    if (previous === current) return;
+    this.attributes[attr] = current;
+    this.notify(`changed:${attr}`, { previous, current });
+    if (broadcastChange) this.notify('changed', { [attr]: value });
+  }
+  get(attr) {
+    return this.attributes[attr];
+  }
   update(attrs) {
     for (let attr in attrs) {
-      this[attr] = attrs[attr];
+      this.set(attr, attrs[attr], false);
     }
     this.notify('changed', attrs);
     return this;
@@ -52,6 +58,9 @@ class Model {
     }
     return this;
   }
+  observe(events, observer) {
+    return this.on(events, observer);
+  }
   off(events, observer) {
     for (let i = 0; i < events.length; i++) {
       let event = events[i];
@@ -60,10 +69,13 @@ class Model {
     }
     return this;
   }
+  unobserve(events, observe) {
+    return this.off(events, observer);
+  }
   getObservers() {
     return this.observers;
   }
-  removeAllObservers() {
+  removeObservers() {
     this.observers = {};
     return this;
   }
@@ -79,6 +91,6 @@ class Model {
   }
 }
 
-Model.type = Type;
+Blueprint.type = Type;
 
-export default Model;
+export default Blueprint;
