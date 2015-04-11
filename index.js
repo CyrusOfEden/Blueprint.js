@@ -18,11 +18,11 @@ var _Type = require('./type');
 
 var _Type2 = _interopRequireWildcard(_Type);
 
-var Model = (function () {
-  function Model() {
+var Blueprint = (function () {
+  function Blueprint() {
     var attrs = arguments[0] === undefined ? {} : arguments[0];
 
-    _classCallCheck(this, Model);
+    _classCallCheck(this, Blueprint);
 
     this.attributes = {};
     this.observers = {};
@@ -32,11 +32,29 @@ var Model = (function () {
     }
   }
 
-  _createClass(Model, [{
+  _createClass(Blueprint, [{
+    key: 'set',
+    value: function set(attr, value) {
+      var broadcastChange = arguments[2] === undefined ? true : arguments[2];
+
+      var previous = this.attributes[attr];
+      var current = this.constructor.attributes[attr](value);
+      if (previous === current) {
+        return;
+      }this.attributes[attr] = current;
+      this.notify('changed:' + attr, { previous: previous, current: current });
+      if (broadcastChange) this.notify('changed', _defineProperty({}, attr, value));
+    }
+  }, {
+    key: 'get',
+    value: function get(attr) {
+      return this.attributes[attr];
+    }
+  }, {
     key: 'update',
     value: function update(attrs) {
       for (var attr in attrs) {
-        this[attr] = attrs[attr];
+        this.set(attr, attrs[attr], false);
       }
       this.notify('changed', attrs);
       return this;
@@ -63,6 +81,11 @@ var Model = (function () {
       return this;
     }
   }, {
+    key: 'observe',
+    value: function observe(events, observer) {
+      return this.on(events, observer);
+    }
+  }, {
     key: 'off',
     value: function off(events, observer) {
       for (var i = 0; i < events.length; i++) {
@@ -73,13 +96,18 @@ var Model = (function () {
       return this;
     }
   }, {
+    key: 'unobserve',
+    value: function unobserve(events, observe) {
+      return this.off(events, observer);
+    }
+  }, {
     key: 'getObservers',
     value: function getObservers() {
       return this.observers;
     }
   }, {
-    key: 'removeAllObservers',
-    value: function removeAllObservers() {
+    key: 'removeObservers',
+    value: function removeObservers() {
       this.observers = {};
       return this;
     }
@@ -102,36 +130,29 @@ var Model = (function () {
     value: function build() {
       var attrs = arguments[0] === undefined ? {} : arguments[0];
 
-      var Through = (function (_Model) {
-        function Through() {
-          _classCallCheck(this, Through);
+      var Model = (function (_Blueprint) {
+        function Model() {
+          _classCallCheck(this, Model);
 
-          if (_Model != null) {
-            _Model.apply(this, arguments);
+          if (_Blueprint != null) {
+            _Blueprint.apply(this, arguments);
           }
         }
 
-        _inherits(Through, _Model);
+        _inherits(Model, _Blueprint);
 
-        return Through;
-      })(Model);
+        return Model;
+      })(Blueprint);
 
       ;
-      Through.attributes = attrs;
 
       var _loop = function (attr) {
-        Object.defineProperty(Through.prototype, attr, {
+        Object.defineProperty(Model.prototype, attr, {
           get: function get() {
-            return this.attributes[attr];
+            return this.get(attr);
           },
           set: function set(value) {
-            var previous = this.attributes[attr];
-            var current = attrs[attr](value);
-            if (current === previous) {
-              return;
-            }this.notify('changed', _defineProperty({}, attr, current));
-            this.notify('changed:' + attr, { previous: previous, current: current });
-            this.attributes[attr] = current;
+            return this.set(attr, value);
           }
         });
       };
@@ -139,14 +160,15 @@ var Model = (function () {
       for (var attr in attrs) {
         _loop(attr);
       }
-      return Through;
+      Model.attributes = attrs;
+      return Model;
     }
   }]);
 
-  return Model;
+  return Blueprint;
 })();
 
-Model.type = _Type2['default'];
+Blueprint.type = _Type2['default'];
 
-exports['default'] = Model;
+exports['default'] = Blueprint;
 module.exports = exports['default'];
