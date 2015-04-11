@@ -1,7 +1,7 @@
 {
-  "name": "Model.js",
+  "name": "blueprint-js",
   "version": "1.0.0",
-  "description": "Full-featured JavaScript POJOs.",
+  "description": "Full-featured JavaScript POJOs. No dependencies.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,15 +22,8 @@
   "homepage": "https://github.com/knrz/Model.js",
   "devDependencies": {
     "babel": "^5.0.12",
-    "babelify": "^6.0.2",
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
-    "gulp-util": "^3.0.4",
-    "vinyl-source-stream": "^1.1.0"
-  },
-  "browserify": {
-    "transform": [
-      "babelify"
-    ]
+    "gulp-util": "^3.0.4"
   }
 }
