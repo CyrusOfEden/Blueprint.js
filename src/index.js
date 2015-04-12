@@ -1,4 +1,4 @@
-import { EventEmitter } from 'event';
+import { EventEmitter } from 'events';
 import Type from './type';
 
 class Blueprint extends EventEmitter {
