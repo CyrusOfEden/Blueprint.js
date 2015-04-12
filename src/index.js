@@ -3,7 +3,11 @@ import Type from './type';
 
 class Blueprint extends EventEmitter {
   static build(attrs = {}) {
-    class Model extends Blueprint {};
+    class Model extends Blueprint {
+      static build(attrs = {}) {
+        return this.constuctor(attrs);
+      }
+    };
     for (let attr in attrs) {
       Object.defineProperty(Model.prototype, attr, {
         get() {
@@ -20,7 +24,6 @@ class Blueprint extends EventEmitter {
   constructor(attrs = {}) {
     super();
     this.attributes = {};
-    this.observers = {};
     for (let attr in attrs) {
       if (!this.constructor.attributes[attr]) continue;
       this[attr] = attrs[attr];
