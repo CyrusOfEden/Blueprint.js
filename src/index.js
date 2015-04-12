@@ -5,7 +5,7 @@ class Blueprint extends EventEmitter {
   static build(attrs = {}) {
     class Model extends Blueprint {
       static build(attrs = {}) {
-        return this.constuctor(attrs);
+        return new this.prototype.constructor(attrs);
       }
     };
     for (let attr in attrs) {
